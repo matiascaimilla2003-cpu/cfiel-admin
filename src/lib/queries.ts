@@ -152,6 +152,35 @@ export async function getDashboardStats(tenantId: string): Promise<DashboardStat
   };
 }
 
+export interface Usuario {
+  id: string;
+  nombre: string;
+  telefono: string | null;
+  nivel: string | null;
+  puntos_total: number;
+  ultima_visita: string | null;
+  created_at: string;
+  tenant_id: string;
+}
+
+export async function getClientes(tenantId: string): Promise<Usuario[]> {
+  console.log("[CFIEL] getClientes → tenant_id:", tenantId);
+
+  const { data, error } = await supabase
+    .from("usuarios")
+    .select("id, nombre, telefono, nivel, puntos_total, ultima_visita, created_at, tenant_id")
+    .eq("tenant_id", tenantId)
+    .order("puntos_total", { ascending: false });
+
+  if (error) {
+    console.error("[CFIEL] getClientes ERROR:", error);
+    throw new Error(`getClientes: ${error.message}`);
+  }
+
+  console.log("[CFIEL] getClientes OK → rows:", data?.length);
+  return (data ?? []) as Usuario[];
+}
+
 export async function getRecentTransactions(
   tenantId: string,
   limit = 20

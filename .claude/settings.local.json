@@ -10,7 +10,14 @@
       "Bash(cp -r public ../cfiel-admin/)",
       "Bash(cp -r node_modules ../cfiel-admin/)",
       "Bash(npm run *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(find \"C:\\\\\\\\Users\\\\\\\\Matias Caimilla\\\\\\\\cfiel-admin\\\\\\\\src\" -type f -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.jsx\")",
+      "Bash(find C:\\\\\\\\Users\\\\\\\\Matias Caimilla\\\\\\\\cfiel-admin\\\\\\\\src *)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\components\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\clientes\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\beneficios\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\api\\\\beneficios\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\api\\\\beneficios\\\\[id]\")",
+      "Bash(npx tsc *)"
     ]
   }
 }
