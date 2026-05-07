@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes --force)",
+      "Read(//c/Users/Matias Caimilla/**)",
+      "Bash(npx create-next-app@latest cfiel-admin-temp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(cp -r src ../cfiel-admin/)",
+      "Bash(cp package.json package-lock.json tsconfig.json next.config.ts postcss.config.mjs eslint.config.mjs .gitignore ../cfiel-admin/)",
+      "Bash(cp -r public ../cfiel-admin/)",
+      "Bash(cp -r node_modules ../cfiel-admin/)",
+      "Bash(npm run *)",
+      "Bash(npm install *)"
+    ]
+  }
+}
