@@ -11,9 +11,9 @@ interface SidebarProps {
 const NAV_ITEMS = [
   { icon: "⊞", label: "Dashboard", href: "/dashboard" },
   { icon: "◎", label: "Clientes", href: "/clientes" },
-  { icon: "↕", label: "Actividad", href: "#" },
+  { icon: "↕", label: "Actividad", href: "/actividad" },
   { icon: "◆", label: "Beneficios", href: "/beneficios" },
-  { icon: "⊕", label: "Misiones", href: "#" },
+  { icon: "⊕", label: "Misiones", href: "/misiones" },
   { icon: "◉", label: "Configuración", href: "#" },
 ];
 

@@ -181,6 +181,38 @@ export async function getClientes(tenantId: string): Promise<Usuario[]> {
   return (data ?? []) as Usuario[];
 }
 
+export interface TransaccionActividad {
+  id: string;
+  tipo: string;
+  puntos: number;
+  descripcion: string | null;
+  created_at: string;
+  usuario_id: string;
+  usuarios: { nombre: string } | null;
+}
+
+export async function getActividad(
+  tenantId: string,
+  limit = 50
+): Promise<TransaccionActividad[]> {
+  console.log("[CFIEL] getActividad → tenant_id:", tenantId);
+
+  const { data, error } = await supabase
+    .from("transacciones_puntos")
+    .select("id, tipo, puntos, descripcion, created_at, usuario_id, usuarios(nombre)")
+    .eq("tenant_id", tenantId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[CFIEL] getActividad ERROR:", error);
+    throw new Error(`getActividad: ${error.message}`);
+  }
+
+  console.log("[CFIEL] getActividad OK → rows:", data?.length);
+  return (data ?? []) as unknown as TransaccionActividad[];
+}
+
 export async function getRecentTransactions(
   tenantId: string,
   limit = 20
