@@ -368,7 +368,7 @@ export default function ClientesPage() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {relativeTime(c.ultima_visita ?? c.created_at)}
+                          {relativeTime(c.ultimo_acceso ?? c.created_at)}
                         </td>
                       </tr>
                     );

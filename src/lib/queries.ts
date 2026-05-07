@@ -158,7 +158,7 @@ export interface Usuario {
   telefono: string | null;
   nivel: string | null;
   puntos_total: number;
-  ultima_visita: string | null;
+  ultimo_acceso: string | null;
   created_at: string;
   tenant_id: string;
 }
@@ -168,7 +168,7 @@ export async function getClientes(tenantId: string): Promise<Usuario[]> {
 
   const { data, error } = await supabase
     .from("usuarios")
-    .select("id, nombre, telefono, nivel, puntos_total, ultima_visita, created_at, tenant_id")
+    .select("id, nombre, telefono, nivel, puntos_total, ultimo_acceso, created_at, tenant_id")
     .eq("tenant_id", tenantId)
     .order("puntos_total", { ascending: false });
 
