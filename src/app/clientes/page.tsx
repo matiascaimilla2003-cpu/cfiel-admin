@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getTenant, getClientes } from "@/lib/queries";
+import { getTenant, getClientes, getReferidosCount } from "@/lib/queries";
 import type { Tenant, Usuario } from "@/lib/queries";
 import Sidebar from "@/components/Sidebar";
 
@@ -44,7 +44,7 @@ function ClientRowSkeleton() {
           <div className="skeleton" style={{ height: 12, width: 110 }} />
         </div>
       </td>
-      {[65, 55, 50, 60].map((w, i) => (
+      {[65, 55, 50, 60, 40].map((w, i) => (
         <td key={i} style={{ padding: "14px 20px" }}>
           <div className="skeleton" style={{ height: 11, width: `${w}%` }} />
         </td>
@@ -57,6 +57,7 @@ export default function ClientesPage() {
   const router = useRouter();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [clientes, setClientes] = useState<Usuario[] | null>(null);
+  const [refCounts, setRefCounts] = useState<Record<string, number>>({});
   const [search, setSearch] = useState("");
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,8 +71,12 @@ export default function ClientesPage() {
     try {
       const t = await getTenant(slug);
       setTenant(t);
-      const c = await getClientes(t.id);
+      const [c, rc] = await Promise.all([
+        getClientes(t.id),
+        getReferidosCount(t.id).catch(() => ({})),
+      ]);
       setClientes(c);
+      setRefCounts(rc);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar datos");
     }
@@ -218,7 +223,7 @@ export default function ClientesPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                  {["Cliente", "Teléfono", "Nivel", "Puntos", "Última visita"].map((h) => (
+                  {["Cliente", "Teléfono", "Nivel", "Puntos", "Referidos", "Última visita"].map((h) => (
                     <th
                       key={h}
                       style={{
@@ -243,7 +248,7 @@ export default function ClientesPage() {
                   Array.from({ length: 7 }).map((_, i) => <ClientRowSkeleton key={i} />)
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={5}>
+                    <td colSpan={6}>
                       <div
                         style={{
                           padding: "60px 20px",
@@ -357,6 +362,21 @@ export default function ClientesPage() {
                           >
                             {(c.puntos_total ?? 0).toLocaleString("es-CL")}
                           </span>
+                        </td>
+
+                        {/* Referidos */}
+                        <td style={{ padding: "12px 20px" }}>
+                          {(refCounts[c.id] ?? 0) > 0 ? (
+                            <span style={{
+                              fontFamily: "var(--font-bebas)",
+                              fontSize: 16, letterSpacing: 1,
+                              color: "var(--acc)",
+                            }}>
+                              {refCounts[c.id]}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 12, color: "var(--muted)" }}>—</span>
+                          )}
                         </td>
 
                         {/* Última visita */}

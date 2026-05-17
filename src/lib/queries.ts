@@ -213,6 +213,20 @@ export async function getActividad(
   return (data ?? []) as unknown as TransaccionActividad[];
 }
 
+export async function getReferidosCount(tenantId: string): Promise<Record<string, number>> {
+  const { data } = await supabase
+    .from("referidos")
+    .select("usuario_referidor")
+    .eq("tenant_id", tenantId)
+    .eq("estado", "registrado");
+
+  const counts: Record<string, number> = {};
+  for (const r of data ?? []) {
+    counts[r.usuario_referidor] = (counts[r.usuario_referidor] ?? 0) + 1;
+  }
+  return counts;
+}
+
 export async function getRecentTransactions(
   tenantId: string,
   limit = 20
