@@ -19,7 +19,9 @@
       "Bash(mkdir -p \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\api\\\\beneficios\\\\[id]\")",
       "Bash(npx tsc *)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\" -Recurse -Directory)",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Matias Caimilla\\\\fiel-client\\\\app\" -Recurse -File | Where-Object { $_.Extension -in '.ts', '.tsx' } | Select-Object FullName)",
+      "PowerShell(dir \"C:\\\\Users\\\\Matias Caimilla\\\\fiel-client\\\\app\" -Recurse | Where-Object { $_.Extension -eq '.ts' -or $_.Extension -eq '.tsx' } | ForEach-Object { $_.FullName })"
     ]
   }
 }
