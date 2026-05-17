@@ -10,7 +10,7 @@ interface Beneficio {
   nombre: string;
   descripcion: string | null;
   icono: string | null;
-  costo_puntos: number;
+  puntos_costo: number;
   disponible: boolean;
   tipo: "producto" | "descuento" | "especial";
   tenant_id: string;
@@ -21,7 +21,7 @@ interface FormData {
   nombre: string;
   descripcion: string;
   icono: string;
-  costo_puntos: string;
+  puntos_costo: string;
   tipo: "producto" | "descuento" | "especial";
 }
 
@@ -86,7 +86,7 @@ export default function BeneficiosPage() {
     nombre: "",
     descripcion: "",
     icono: "🎁",
-    costo_puntos: "",
+    puntos_costo: "",
     tipo: "producto",
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -131,7 +131,7 @@ export default function BeneficiosPage() {
   }, [showModal]);
 
   async function handleCreate() {
-    if (!tenantId || !form.nombre || !form.costo_puntos) return;
+    if (!tenantId || !form.nombre || !form.puntos_costo) return;
     setSaving(true);
     setError(null);
     try {
@@ -143,7 +143,7 @@ export default function BeneficiosPage() {
           nombre: form.nombre,
           descripcion: form.descripcion || null,
           icono: form.icono || "🎁",
-          costo_puntos: parseInt(form.costo_puntos, 10),
+          puntos_costo: parseInt(form.puntos_costo, 10),
           tipo: form.tipo,
         }),
       });
@@ -152,7 +152,7 @@ export default function BeneficiosPage() {
         throw new Error(body.error ?? "Error al crear beneficio");
       }
       setShowModal(false);
-      setForm({ nombre: "", descripcion: "", icono: "🎁", costo_puntos: "", tipo: "producto" });
+      setForm({ nombre: "", descripcion: "", icono: "🎁", puntos_costo: "", tipo: "producto" });
       await loadBeneficios(tenantId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear beneficio");
@@ -200,7 +200,7 @@ export default function BeneficiosPage() {
   }
 
   const loading = beneficios === null && !loadFailed;
-  const canCreate = !saving && form.nombre.trim() !== "" && form.costo_puntos !== "";
+  const canCreate = !saving && form.nombre.trim() !== "" && form.puntos_costo !== "";
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "var(--bg)", overflow: "hidden" }}>
@@ -319,7 +319,7 @@ export default function BeneficiosPage() {
 
                       <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: b.descripcion ? 0 : 8, flexWrap: "wrap" }}>
                         <span style={{ fontFamily: "var(--font-bebas)", fontSize: 16, letterSpacing: 1, color: "var(--acc)" }}>
-                          {b.costo_puntos.toLocaleString("es-CL")} pts
+                          {b.puntos_costo.toLocaleString("es-CL")} pts
                         </span>
 
                         {b.tipo && (
@@ -461,8 +461,8 @@ export default function BeneficiosPage() {
                     type="number"
                     placeholder="500"
                     min={1}
-                    value={form.costo_puntos}
-                    onChange={(e) => setForm((f) => ({ ...f, costo_puntos: e.target.value }))}
+                    value={form.puntos_costo}
+                    onChange={(e) => setForm((f) => ({ ...f, puntos_costo: e.target.value }))}
                     style={INPUT_BASE}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--acc)")}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border)")}

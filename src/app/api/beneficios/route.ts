@@ -23,11 +23,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { tenant_id, nombre, descripcion, icono, costo_puntos, tipo } = body;
+  const { tenant_id, nombre, descripcion, icono, puntos_costo, tipo } = body;
 
-  if (!tenant_id || !nombre || costo_puntos === undefined) {
+  if (!tenant_id || !nombre || puntos_costo === undefined) {
     return NextResponse.json(
-      { error: "tenant_id, nombre y costo_puntos son requeridos" },
+      { error: "tenant_id, nombre y puntos_costo son requeridos" },
       { status: 400 }
     );
   }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       nombre,
       descripcion: descripcion || null,
       icono: icono || "🎁",
-      costo_puntos: Number(costo_puntos),
+      puntos_costo: Number(puntos_costo),
       tipo: tipo || "producto",
       disponible: true,
     })
