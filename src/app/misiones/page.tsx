@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getTenant } from "@/lib/queries";
-import type { Tenant } from "@/lib/queries";
 import Sidebar from "@/components/Sidebar";
 
 interface Mision {
@@ -44,6 +43,15 @@ const INPUT_BASE: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  color: "var(--muted)",
+  letterSpacing: 1,
+  textTransform: "uppercase",
+  display: "block",
+  marginBottom: 5,
+};
+
 const META_TIPO_LABELS: Record<string, string> = {
   compras: "Cantidad de compras",
   monto: "Monto total ($)",
@@ -66,14 +74,7 @@ function formatFecha(iso: string): string {
 
 function MisionSkeleton() {
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #1a1a1a, #181818)",
-        border: "1px solid var(--border)",
-        borderRadius: 12,
-        padding: "18px 20px",
-      }}
-    >
+    <div style={{ background: "linear-gradient(135deg, #1a1a1a, #181818)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
         <div className="skeleton" style={{ height: 14, width: "45%" }} />
         <div className="skeleton" style={{ height: 22, width: 60, borderRadius: 5 }} />
@@ -89,9 +90,9 @@ function MisionSkeleton() {
 
 export default function MisionesPage() {
   const router = useRouter();
-  const [tenant, setTenant] = useState<Tenant | null>(null);
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [misiones, setMisiones] = useState<Mision[] | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -117,18 +118,18 @@ export default function MisionesPage() {
   }, []);
 
   const loadData = useCallback(async () => {
+    setLoadFailed(false);
     const auth = localStorage.getItem("cfiel_auth");
     if (!auth) { router.replace("/login"); return; }
     const slug = localStorage.getItem("cfiel_admin_tenant");
     if (!slug) { router.replace("/login"); return; }
-
     try {
       const t = await getTenant(slug);
-      setTenant(t);
       setTenantId(t.id);
       await loadMisiones(t.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar datos");
+      setLoadFailed(true);
     }
   }, [router, loadMisiones]);
 
@@ -207,9 +208,7 @@ export default function MisionesPage() {
     form.meta_valor !== "" &&
     form.fecha_fin !== "";
 
-  void tenant;
-
-  const loading = !misiones;
+  const loading = misiones === null && !loadFailed;
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "var(--bg)", overflow: "hidden" }}>
@@ -217,30 +216,19 @@ export default function MisionesPage() {
 
       <main style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
         {/* Header */}
-        <header
-          style={{
-            padding: "20px 32px",
-            borderBottom: "1px solid var(--border)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "var(--bg)",
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-          }}
-        >
+        <header style={{
+          padding: "20px 32px",
+          borderBottom: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "var(--bg)",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+        }}>
           <div>
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "var(--font-bebas)",
-                fontSize: 32,
-                letterSpacing: 3,
-                color: "var(--hi)",
-                lineHeight: 1,
-              }}
-            >
+            <h1 style={{ margin: 0, fontFamily: "var(--font-bebas)", fontSize: 32, letterSpacing: 3, color: "var(--hi)", lineHeight: 1 }}>
               MISIONES
             </h1>
             <p style={{ margin: "5px 0 0", fontSize: 12, color: "var(--muted)" }}>
@@ -250,26 +238,11 @@ export default function MisionesPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {error && (
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#ff8a80",
-                  background: "rgba(255,90,80,0.08)",
-                  border: "1px solid rgba(255,90,80,0.2)",
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
+              <div style={{ fontSize: 12, color: "#ff8a80", background: "rgba(255,90,80,0.08)", border: "1px solid rgba(255,90,80,0.2)", padding: "6px 12px", borderRadius: 6, display: "flex", alignItems: "center", gap: 8 }}>
                 <span>⚠</span> {error}
                 <button
                   onClick={() => setError(null)}
-                  style={{
-                    background: "none", border: "none", color: "#ff8a80",
-                    cursor: "pointer", fontSize: 13, fontFamily: "inherit", padding: 0,
-                  }}
+                  style={{ background: "none", border: "none", color: "#ff8a80", cursor: "pointer", fontSize: 13, fontFamily: "inherit", padding: 0 }}
                 >
                   ✕
                 </button>
@@ -277,19 +250,7 @@ export default function MisionesPage() {
             )}
             <button
               onClick={() => setShowModal(true)}
-              style={{
-                padding: "9px 18px",
-                background: "var(--acc)",
-                border: "none",
-                borderRadius: 8,
-                color: "#0a0a0a",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                letterSpacing: 0.4,
-                transition: "opacity 0.15s",
-              }}
+              style={{ padding: "9px 18px", background: "var(--acc)", border: "none", borderRadius: 8, color: "#0a0a0a", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", letterSpacing: 0.4, transition: "opacity 0.15s" }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
@@ -301,61 +262,40 @@ export default function MisionesPage() {
         {/* Body */}
         <div style={{ padding: "28px 32px", flex: 1 }}>
           {loading ? (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 16,
-              }}
-            >
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
               {Array.from({ length: 4 }).map((_, i) => <MisionSkeleton key={i} />)}
             </div>
-          ) : misiones.length === 0 ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "80px 20px",
-                gap: 14,
-                textAlign: "center",
-              }}
-            >
-              <span style={{ fontSize: 48, opacity: 0.2 }}>⊕</span>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 500, color: "var(--mid)" }}>
-                Sin misiones configuradas
+          ) : loadFailed ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 20px", gap: 14, textAlign: "center" }}>
+              <span style={{ fontSize: 36, opacity: 0.3 }}>⚠</span>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 500, color: "var(--mid)" }}>No se pudieron cargar las misiones</p>
+              <p style={{ margin: 0, fontSize: 13, color: "var(--muted)", maxWidth: 340, lineHeight: 1.5 }}>
+                Verifica tu conexión y vuelve a intentarlo.
               </p>
+              <button
+                onClick={loadData}
+                style={{ marginTop: 6, padding: "9px 20px", background: "var(--acc)", border: "none", borderRadius: 8, color: "#0a0a0a", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Reintentar
+              </button>
+            </div>
+          ) : misiones!.length === 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 20px", gap: 14, textAlign: "center" }}>
+              <span style={{ fontSize: 48, opacity: 0.2 }}>⊕</span>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 500, color: "var(--mid)" }}>Sin misiones configuradas</p>
               <p style={{ margin: 0, fontSize: 13, color: "var(--muted)", maxWidth: 360, lineHeight: 1.5 }}>
                 Crea desafíos para motivar a tus clientes a volver más seguido.
               </p>
               <button
                 onClick={() => setShowModal(true)}
-                style={{
-                  marginTop: 6,
-                  padding: "10px 22px",
-                  background: "var(--acc)",
-                  border: "none",
-                  borderRadius: 8,
-                  color: "#0a0a0a",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                }}
+                style={{ marginTop: 6, padding: "10px 22px", background: "var(--acc)", border: "none", borderRadius: 8, color: "#0a0a0a", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
               >
                 ＋ Crear primera misión
               </button>
             </div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 16,
-              }}
-            >
-              {misiones.map((m) => {
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
+              {misiones!.map((m) => {
                 const status = getStatus(m);
                 const statusColors: Record<MisionStatus, { bg: string; color: string; border: string }> = {
                   activa: { bg: "rgba(46,204,113,0.12)", color: "#2ECC71", border: "rgba(46,204,113,0.25)" },
@@ -376,98 +316,34 @@ export default function MisionesPage() {
                     }}
                   >
                     {/* Título + badge */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        gap: 8,
-                        marginBottom: 6,
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: "var(--hi)",
-                          lineHeight: 1.3,
-                          flex: 1,
-                          minWidth: 0,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--hi)", lineHeight: 1.3, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {m.titulo}
                       </div>
-                      <span
-                        style={{
-                          padding: "3px 8px",
-                          borderRadius: 5,
-                          fontSize: 10,
-                          fontWeight: 600,
-                          flexShrink: 0,
-                          textTransform: "capitalize",
-                          background: sc.bg,
-                          color: sc.color,
-                          border: `1px solid ${sc.border}`,
-                        }}
-                      >
+                      <span style={{ padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, flexShrink: 0, textTransform: "capitalize", background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
                         {status === "activa" ? "Activa" : status === "vencida" ? "Vencida" : "Inactiva"}
                       </span>
                     </div>
 
                     {/* Descripción */}
                     {m.descripcion && (
-                      <p
-                        style={{
-                          margin: "0 0 12px",
-                          fontSize: 11,
-                          color: "var(--muted)",
-                          lineHeight: 1.4,
-                          overflow: "hidden",
-                          maxHeight: "2.8em",
-                        }}
-                      >
+                      <p style={{ margin: "0 0 12px", fontSize: 11, color: "var(--muted)", lineHeight: 1.4, overflow: "hidden", maxHeight: "2.8em" }}>
                         {m.descripcion}
                       </p>
                     )}
 
                     {/* Meta + puntos */}
                     <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: "var(--muted)",
-                          background: "rgba(255,255,255,0.04)",
-                          border: "1px solid var(--border)",
-                          padding: "3px 8px",
-                          borderRadius: 5,
-                        }}
-                      >
+                      <span style={{ fontSize: 11, color: "var(--muted)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", padding: "3px 8px", borderRadius: 5 }}>
                         {META_TIPO_LABELS[m.meta_tipo] ?? m.meta_tipo}: {m.meta_valor}
                       </span>
-                      <span
-                        style={{
-                          fontFamily: "var(--font-bebas)",
-                          fontSize: 15,
-                          letterSpacing: 1,
-                          color: "var(--acc)",
-                        }}
-                      >
+                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: 15, letterSpacing: 1, color: "var(--acc)" }}>
                         +{m.puntos_premio.toLocaleString("es-CL")} pts
                       </span>
                     </div>
 
-                    {/* Fechas */}
-                    <div
-                      style={{
-                        fontSize: 10,
-                        color: "var(--muted)",
-                        marginBottom: 12,
-                        letterSpacing: 0.3,
-                      }}
-                    >
+                    {/* Fecha fin */}
+                    <div style={{ fontSize: 10, color: "var(--muted)", marginBottom: 12, letterSpacing: 0.3 }}>
                       Vence el {formatFecha(m.fecha_fin)}
                     </div>
 
@@ -482,12 +358,8 @@ export default function MisionesPage() {
                           fontWeight: 600,
                           cursor: "pointer",
                           fontFamily: "inherit",
-                          border: m.activa
-                            ? "1px solid rgba(150,150,150,0.3)"
-                            : "1px solid rgba(46,204,113,0.3)",
-                          background: m.activa
-                            ? "rgba(150,150,150,0.08)"
-                            : "rgba(46,204,113,0.08)",
+                          border: m.activa ? "1px solid rgba(150,150,150,0.3)" : "1px solid rgba(46,204,113,0.3)",
+                          background: m.activa ? "rgba(150,150,150,0.08)" : "rgba(46,204,113,0.08)",
                           color: m.activa ? "var(--muted)" : "#2ECC71",
                           transition: "all 0.15s",
                         }}
@@ -505,58 +377,18 @@ export default function MisionesPage() {
 
       {/* Modal */}
       {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.72)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 100,
-            backdropFilter: "blur(4px)",
-          }}
-        >
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.72)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)" }}>
           <div
             ref={modalRef}
-            style={{
-              background: "#161616",
-              border: "1px solid var(--border2)",
-              borderRadius: 16,
-              padding: "28px 28px 24px",
-              width: "100%",
-              maxWidth: 460,
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
+            style={{ background: "#161616", border: "1px solid var(--border2)", borderRadius: 16, padding: "28px 28px 24px", width: "100%", maxWidth: 460, boxShadow: "0 24px 60px rgba(0,0,0,0.6)", maxHeight: "90vh", overflowY: "auto" }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 22,
-              }}
-            >
-              <h2
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--font-bebas)",
-                  fontSize: 24,
-                  letterSpacing: 2,
-                  color: "var(--hi)",
-                }}
-              >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
+              <h2 style={{ margin: 0, fontFamily: "var(--font-bebas)", fontSize: 24, letterSpacing: 2, color: "var(--hi)" }}>
                 NUEVA MISIÓN
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                style={{
-                  background: "none", border: "none", color: "var(--muted)",
-                  cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 2,
-                  fontFamily: "inherit",
-                }}
+                style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 2, fontFamily: "inherit" }}
               >
                 ✕
               </button>
@@ -565,7 +397,7 @@ export default function MisionesPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {/* Título */}
               <div>
-                <label style={labelStyle}>Título *</label>
+                <label style={LABEL_STYLE}>Título *</label>
                 <input
                   type="text"
                   placeholder="Ej: Fiel de la semana"
@@ -579,7 +411,7 @@ export default function MisionesPage() {
 
               {/* Descripción */}
               <div>
-                <label style={labelStyle}>Descripción</label>
+                <label style={LABEL_STYLE}>Descripción</label>
                 <textarea
                   placeholder="Describe el desafío para tus clientes"
                   value={form.descripcion}
@@ -591,10 +423,10 @@ export default function MisionesPage() {
                 />
               </div>
 
-              {/* Puntos premio + Fecha fin */}
+              {/* Puntos + Fecha */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Puntos premio *</label>
+                  <label style={LABEL_STYLE}>Puntos premio *</label>
                   <input
                     type="number"
                     placeholder="500"
@@ -607,7 +439,7 @@ export default function MisionesPage() {
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Fecha fin *</label>
+                  <label style={LABEL_STYLE}>Fecha fin *</label>
                   <input
                     type="date"
                     min={today}
@@ -623,20 +455,11 @@ export default function MisionesPage() {
               {/* Meta tipo + Meta valor */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Meta tipo *</label>
+                  <label style={LABEL_STYLE}>Meta tipo *</label>
                   <select
                     value={form.meta_tipo}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        meta_tipo: e.target.value as FormData["meta_tipo"],
-                      }))
-                    }
-                    style={{
-                      ...INPUT_BASE,
-                      appearance: "none",
-                      cursor: "pointer",
-                    }}
+                    onChange={(e) => setForm((f) => ({ ...f, meta_tipo: e.target.value as FormData["meta_tipo"] }))}
+                    style={{ ...INPUT_BASE, appearance: "none", cursor: "pointer" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--acc)")}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
                   >
@@ -646,12 +469,10 @@ export default function MisionesPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Meta valor *</label>
+                  <label style={LABEL_STYLE}>Meta valor *</label>
                   <input
                     type="number"
-                    placeholder={
-                      form.meta_tipo === "monto" ? "10000" : "5"
-                    }
+                    placeholder={form.meta_tipo === "monto" ? "10000" : "5"}
                     min={1}
                     value={form.meta_valor}
                     onChange={(e) => setForm((f) => ({ ...f, meta_valor: e.target.value }))}
@@ -668,10 +489,10 @@ export default function MisionesPage() {
                 style={{
                   marginTop: 6,
                   padding: "11px 18px",
-                  background: canCreate ? "var(--acc)" : "rgba(212,168,71,0.35)",
+                  background: canCreate ? "var(--acc)" : "rgba(208,208,208,0.15)",
                   border: "none",
                   borderRadius: 8,
-                  color: "#0a0a0a",
+                  color: canCreate ? "#0a0a0a" : "var(--muted)",
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: canCreate ? "pointer" : "not-allowed",
@@ -691,12 +512,3 @@ export default function MisionesPage() {
     </div>
   );
 }
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 10,
-  color: "var(--muted)",
-  letterSpacing: 1,
-  textTransform: "uppercase",
-  display: "block",
-  marginBottom: 5,
-};

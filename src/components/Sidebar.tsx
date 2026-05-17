@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { icon: "↕", label: "Actividad", href: "/actividad" },
   { icon: "◆", label: "Beneficios", href: "/beneficios" },
   { icon: "⊕", label: "Misiones", href: "/misiones" },
-  { icon: "◉", label: "Configuración", href: "#" },
+  { icon: "◉", label: "Configuración", href: "/configuracion" },
 ];
 
 function CfielLogo({ collapsed }: { collapsed: boolean }) {

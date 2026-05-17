@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { tenant_id, nombre, descripcion, icono, costo_puntos } = body;
+  const { tenant_id, nombre, descripcion, icono, costo_puntos, tipo } = body;
 
   if (!tenant_id || !nombre || costo_puntos === undefined) {
     return NextResponse.json(
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       descripcion: descripcion || null,
       icono: icono || "🎁",
       costo_puntos: Number(costo_puntos),
+      tipo: tipo || "producto",
       disponible: true,
     })
     .select()

@@ -17,7 +17,9 @@
       "Bash(find C:\\\\\\\\Users\\\\\\\\Matias Caimilla\\\\\\\\cfiel-admin\\\\\\\\src *)",
       "Bash(mkdir -p \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\components\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\clientes\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\beneficios\" \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\api\\\\beneficios\")",
       "Bash(mkdir -p \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\\\\src\\\\app\\\\api\\\\beneficios\\\\[id]\")",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Matias Caimilla\\\\cfiel-admin\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }
