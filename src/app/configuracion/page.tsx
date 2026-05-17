@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getTenant } from "@/lib/queries";
 import Sidebar from "@/components/Sidebar";
 
-const CLIENT_URL = "https://fiel-client.vercel.app";
+const CLIENT_URL = "https://cfiel-app.vercel.app";
 const CAJERO_URL = "https://fiel-client.vercel.app/cajero";
 const CAJERO_PASSWORD = "tiopolo2025";
 const WHATSAPP_URL = "https://wa.me/56900000000";
@@ -129,7 +129,7 @@ export default function ConfiguracionPage() {
     localStorage.removeItem("cfiel_auth");
     localStorage.removeItem("cfiel_user");
     localStorage.removeItem("cfiel_admin_tenant");
-    window.location.href = "https://cfiel-landing.vercel.app";
+    window.location.href = "https://cfiel.vercel.app";
   }
 
   if (pageLoading) {
